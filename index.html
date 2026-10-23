@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f5f5ef"><meta name="description" content="운동 순서는 알아서, 기록은 간단하게. 나만의 운동 달력.">
+  <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="하루 운동"><meta name="format-detection" content="telephone=no">
+  <title>하루 운동 · 나의 운동 달력</title>
+  <link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="./icon-192.png"><link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./styles.css">
+  <script defer src="./engine.js"></script><script defer src="./app.js"></script>
+</head>
+<body>
+<div class="app-shell">
+  <header class="app-header"><a class="brand" href="./" aria-label="하루 운동 홈"><span class="brand-icon" aria-hidden="true">↗</span>하루 운동<span class="brand-dot">.</span></a><button class="icon-button" id="settingsBtn" aria-label="설정 및 백업"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3" fill="currentColor"/><circle cx="15" cy="17" r="3" fill="currentColor"/></svg></button></header>
+  <div id="storageWarning" class="warning" hidden></div>
+  <main>
+    <section class="intro"><p class="eyebrow">MY LITTLE ROUTINE</p><h1>차곡차곡, 나의 페이스로.</h1><p class="subtitle">운동 순서는 알아서. 오늘의 기록은 가볍게.</p></section>
+    <section id="todayCard" class="today-card" aria-label="오늘의 운동"></section>
+    <section class="calendar-panel" aria-label="운동 달력">
+      <div class="month-toolbar"><div class="month-title"><h2 id="monthTitle"></h2><button id="todayBtn" class="small-button">오늘</button></div><div class="month-nav"><button class="icon-button" id="prevMonth" aria-label="이전 달">‹</button><button class="icon-button" id="nextMonth" aria-label="다음 달">›</button></div></div>
+      <div class="weekdays" aria-hidden="true"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
+      <div id="calendar" class="calendar-grid" role="group" aria-label="날짜별 운동"></div>
+      <div class="legend"><span><i class="dot done"></i>완료</span><span><i class="dot rest"></i>휴식</span><span><i class="dot pass"></i>패스</span><span><i class="dot missing"></i>미기록</span><span class="note-key">· 메모 있음</span></div>
+    </section>
+    <section class="routine-panel"><div class="section-heading"><h2>나의 반복 루틴</h2><button id="routineBtn" class="text-button">루틴 설정 <span aria-hidden="true">↗</span></button></div><div id="routineSummary"></div></section>
+    <section class="upcoming-panel"><div class="section-heading"><h2>다가오는 운동</h2><span class="muted small">내일부터 7일</span></div><div id="upcoming"></div></section>
+    <footer>매일 완벽할 필요는 없으니까.<br><span>기록은 이 기기에만 저장돼요.</span></footer>
+  </main>
+</div>
+<button id="floatingToday" class="floating-today"><span aria-hidden="true">＋</span> 오늘 기록하기</button>
+<dialog id="dayDialog" class="sheet"><form id="dayForm"><div class="sheet-top"><span class="eyebrow" id="dayDate"></span><button type="button" class="icon-button" data-close aria-label="닫기">×</button></div><h2>오늘의 작은 기록</h2><p id="dayPlanned" class="sheet-description"></p>
+  <fieldset class="status-field"><legend>어떻게 보냈나요?</legend><div class="status-options"><label><input type="radio" name="status" value="done"><span>✓ 완료</span></label><label><input type="radio" name="status" value="rest"><span>☾ 휴식</span></label><label><input type="radio" name="status" value="pass"><span>↷ 패스</span></label><label><input type="radio" name="status" value="none"><span>— 미정</span></label></div></fieldset>
+  <label class="field-label" for="actual">그날 운동 <span class="optional">다른 운동으로 바꿔도 괜찮아요</span></label><input id="actual" maxlength="24" list="workoutNames" autocomplete="off" placeholder="예: 상체, 팔, 유산소"><datalist id="workoutNames"></datalist>
+  <fieldset id="advanceField" class="advance-field" hidden><legend>다음 일정은 어떻게 할까요?</legend><label class="radio-row"><input type="radio" name="advance" value="advance" checked><span><b>기존 순서 유지</b><small id="advanceHint"></small></span></label><label class="radio-row"><input type="radio" name="advance" value="hold"><span><b>원래 운동을 다음 날로 미루기</b><small id="holdHint"></small></span></label><p class="field-note">이 선택은 이번 기록에만 적용돼요. 이후 예정 일정이 다시 계산돼요.</p></fieldset>
+  <label class="field-label" for="note">짧은 메모 <span class="optional">선택</span></label><textarea id="note" rows="3" maxlength="2000" placeholder="컨디션, 잘한 점, 다음에 기억할 것…"></textarea><p class="field-note" id="dayEditNote">메모만 남겨도 저장할 수 있어요.</p>
+  <div class="sheet-actions"><button type="button" id="clearDay" class="subtle-button">기록 지우기</button><button type="submit" class="primary-button">기록 저장</button></div>
+</form></dialog>
+<dialog id="routineDialog" class="sheet"><form id="routineForm"><div class="sheet-top"><span class="eyebrow">MAKE IT YOURS</span><button type="button" class="icon-button" data-close aria-label="닫기">×</button></div><h2>내 페이스에 맞는 루틴</h2><p class="sheet-description">운동과 휴식을 원하는 순서로 넣어주세요.<br>마지막 순서가 끝나면 처음부터 반복해요.</p>
+  <div class="date-fields"><div><label class="field-label" for="routineStart">시작일</label><input type="date" id="routineStart" min="2000-01-01" max="2099-12-31" required></div><div><label class="field-label" for="routineEnd">종료일 <span class="optional">선택</span></label><input type="date" id="routineEnd" min="2000-01-01" max="2099-12-31"></div></div>
+  <p class="field-note">종료일을 비우면 계속 반복해요.</p><div class="preset-bar"><button type="button" data-preset="상체,하체,휴식">상체 · 하체 · 휴식</button><button type="button" data-preset="상체,하체,휴식,팔,어깨,휴식">6일 루틴</button></div>
+  <div class="steps-heading"><span class="field-label">반복 순서</span><span class="muted small" id="stepCount"></span></div><div id="steps"></div><button type="button" id="addStep" class="add-step">＋ 순서 추가</button>
+  <label class="field-label" for="routineSkipMode">패스·휴식 시 기본 처리</label><select id="routineSkipMode"><option value="ask">매번 선택하기</option><option value="advance">기존 순서 유지</option><option value="hold">원래 운동을 다음 날로 미루기</option></select><p class="field-note">기본값을 정해도 기록할 때 바꿀 수 있어요.</p>
+  <div class="info-box">적용하면 시작일부터 이후의 예정 루틴을 교체해요. 종료일 이후는 비워집니다. 이미 저장한 운동·상태·메모는 유지돼요.</div><button type="submit" class="primary-button full-width">달력에 루틴 적용</button>
+</form></dialog>
+<dialog id="settingsDialog" class="sheet"><div class="sheet-top"><span class="eyebrow">JUST FOR YOU</span><button type="button" class="icon-button" data-close aria-label="닫기">×</button></div><h2>설정과 기록 보관</h2><p class="sheet-description">가입 없이, 알림 없이.<br>당신의 휴대폰에만 기록을 보관해요.</p>
+  <label class="field-label" for="settingsSkipMode">패스·휴식 시 기본 처리</label><select id="settingsSkipMode"><option value="ask">매번 선택하기</option><option value="advance">기존 순서 유지</option><option value="hold">원래 운동을 다음 날로 미루기</option></select><p class="field-note">기존 기록에는 영향을 주지 않아요.</p>
+  <div class="setting-card"><h3>소중한 기록, 가끔은 백업</h3><p>브라우저 데이터 삭제나 기기 변경에 대비해 백업 파일을 보관해주세요. 자동 기기 연동은 하지 않아요.</p><div class="button-pair"><button id="exportBtn" class="secondary-button">백업 다운로드</button><button id="importBtn" class="secondary-button">백업 복원</button></div><input type="file" id="importFile" accept=".json,application/json" hidden><p class="field-note" id="backupInfo"></p></div>
+  <div class="setting-card"><h3>앱처럼 쓰기</h3><p>아이폰: Safari 공유 → 홈 화면에 추가<br>갤럭시: Chrome 메뉴 → 홈 화면에 추가 / 앱 설치</p><p class="field-note">홈 화면 앱과 브라우저 탭의 저장공간이 다를 수 있어요. 처음부터 홈 화면 아이콘으로 사용하는 걸 추천해요.</p><button id="persistBtn" class="text-button">기록 보관 권한 요청</button><p id="persistInfo" class="field-note">기기에서 지원하는 경우에만 저장공간 보호를 요청해요. 백업을 대신하지는 않아요.</p></div>
+  <p class="version-note">하루 운동 v1.0 · 광고·추적·알림 없음</p>
+</dialog>
+<dialog id="confirmDialog" class="confirm-dialog"><h2 id="confirmTitle"></h2><p id="confirmText"></p><div class="button-pair"><button id="confirmCancel" class="secondary-button">취소</button><button id="confirmOK" class="primary-button">확인</button></div></dialog>
+<div id="toast" popover="manual" role="status" aria-live="polite"></div>
+<noscript>운동 달력을 사용하려면 브라우저에서 JavaScript를 켜주세요.</noscript>
+</body></html>
